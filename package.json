@@ -4,8 +4,8 @@
   "description": "searchHub javascript client",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "start": "webpack-dev-server --mode development",
+    "build": "webpack",
+    "dev": "webpack-dev-server --mode development",
     "test": ""
   },
   "repository": {
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/CommerceExperts/searchhub-js-client#readme",
   "devDependencies": {
     "@types/node": "^22.5.3",
+    "clean-webpack-plugin": "^4.0.0",
     "source-map-loader": "^5.0.0",
     "ts-loader": "^9.5.1",
     "webpack": "^5.94.0",

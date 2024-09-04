@@ -5,6 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
+    "merge:dts": "rollup -c rollup.config.js",
+    "tmp-dir": "mkdir dist/tmp -p",
+    "clean:dts": "npm run tmp-dir && mv dist/index.d.ts dist/tmp/index_temp.d.ts && rimraf dist/*.d.ts && mv dist/tmp/index_temp.d.ts dist/index.d.ts && rm -rf dist/tmp",
+    "build:prod": "npm run build && npm run merge:dts && npm run clean:dts",
     "dev": "webpack-dev-server --mode development",
     "test": ""
   },
@@ -26,6 +30,9 @@
   "devDependencies": {
     "@types/node": "^22.5.3",
     "clean-webpack-plugin": "^4.0.0",
+    "rimraf": "^5.0.10",
+    "rollup": "^4.21.2",
+    "rollup-plugin-dts": "^6.1.1",
     "source-map-loader": "^5.0.0",
     "ts-loader": "^9.5.1",
     "webpack": "^5.94.0",

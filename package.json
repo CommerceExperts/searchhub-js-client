@@ -2,7 +2,10 @@
   "name": "searchhub-js-client",
   "version": "0.3.0",
   "description": "searchHub javascript client",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "webpack",
     "merge:dts": "rollup -c rollup.config.js",

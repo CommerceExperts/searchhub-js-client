@@ -1,0 +1,7 @@
+src/
+node_modules/
+test/
+*.config.js
+*.md
+.gitignore
+tsconfig.json

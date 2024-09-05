@@ -31,3 +31,19 @@ export const getBrowserCookie = (cname: string): string | "" => {
     }
     return "";
 }
+
+export class BrowserCookieAccess implements CookieAccess {
+    setCookie(name: string, value: string): void {
+        setBrowserCookie(name, value);
+    }
+
+    getCookie(name: string): string {
+        return getBrowserCookie(name);
+    }
+}
+
+export interface CookieAccess {
+    setCookie(name: string, value: string): void;
+
+    getCookie(name: string): string;
+}

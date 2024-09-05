@@ -4,3 +4,4 @@ export {SmartQueryClient, SmartQueryClientConfig} from "./SmartQueryClient";
 export {Suggestion, SmartSuggestClientConfig, SmartSuggestClient} from "./SmartSuggestClient";
 export {ICache} from "./cache/ICache";
 export {SimpleMemoryCache} from "./cache/SimpleMemoryCache";
+export {ClientFactory} from "./ClientFactory";

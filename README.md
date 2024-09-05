@@ -10,6 +10,29 @@
 
 # Usage
 
+recommended way
+
+```typescript
+import {BrowserCookieAccess, ClientFactory} from "searchhub-js-client";
+
+const {smartSuggestClient, smartQueryClient, abTestManager} = ClientFactory({
+    tenant: "your.tenant",
+    cookieAccess: new BrowserCookieAccess(),
+    abTestActive: true
+});
+
+
+if (abTestManager.isSearchhubActive()) {
+    // use our client
+    const suggestions = await smartSuggestClient.getSuggestions("jeannss");
+} else {
+    // use your own as you type suggest endpoint
+}
+
+// automatically respects ab test assignment
+const mapping = await smartQueryClient.getMapping("jeanss");
+```
+
 smartSuggest
 
 ```typescript

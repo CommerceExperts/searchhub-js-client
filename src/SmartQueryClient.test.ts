@@ -1,5 +1,5 @@
 import {SmartQueryClient, SmartQueryClientConfig} from './SmartQueryClient';
-import {Cache} from './cache/Cache';
+import {ICache} from './cache/ICache';
 
 
 const mockFetch = jest.fn(() =>
@@ -14,7 +14,7 @@ const mockFetch = jest.fn(() =>
 global.fetch = mockFetch as any;
 
 describe('SmartQueryClient', () => {
-    let cache: Cache;
+    let cache: ICache;
     let queryClient: SmartQueryClient;
 
     beforeEach(() => {

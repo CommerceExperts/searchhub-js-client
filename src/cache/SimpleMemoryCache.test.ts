@@ -57,7 +57,7 @@ describe('SimpleMemoryCache', () => {
         expect(cache.size()).toBe(2); // Both keys should be in the cache
 
         cache.clear();
-        expect(cache.size()).toBe(0); // Cache should be empty
+        expect(cache.size()).toBe(0); // ICache should be empty
         expect(cache.get('key1')).toBeUndefined();
         expect(cache.get('key2')).toBeUndefined();
     });

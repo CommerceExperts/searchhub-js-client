@@ -1,4 +1,4 @@
-import {Cache} from "./Cache";
+import {ICache} from "./ICache";
 
 interface CacheItem {
     value: any;
@@ -11,7 +11,7 @@ interface CacheItem {
  *
  * @class
  */
-export class SimpleMemoryCache implements Cache {
+export class SimpleMemoryCache implements ICache {
     private cache: Map<string, CacheItem>;
     private readonly defaultTTL: number; // TTL in milliseconds
     private cleanupInterval: NodeJS.Timeout | null = null;

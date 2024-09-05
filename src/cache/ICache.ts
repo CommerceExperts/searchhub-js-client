@@ -1,4 +1,4 @@
-export interface Cache {
+export interface ICache {
     /**
      * Stores a key-value pair in the cache.
      *

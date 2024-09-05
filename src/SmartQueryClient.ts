@@ -1,6 +1,6 @@
 import {AbTestSegmentManager} from "./AbTestSegmentManager";
 import {isTenantValidOrThrow} from "./util";
-import {Cache} from "cache/Cache";
+import {ICache} from "src/cache/ICache";
 
 /**
  * SmartQueryClientConfig is used to configure the SmartQueryClient.
@@ -44,16 +44,16 @@ export class SmartQueryClient {
     private readonly channel: string;
     private readonly apiKey: string | undefined;
     private readonly isAbTestActive: boolean;
-    private readonly cache?: Cache;
+    private readonly cache?: ICache;
 
     /**
      * Creates an instance of SmartQueryClient.
      *
      * @param {SmartQueryClientConfig} config - Configuration object for SmartQueryClient.
-     * @param {Cache} [cache] - Optional cache to retrieve `userQuery` to `searchQuery` mappings.
+     * @param {ICache} [cache] - Optional cache to retrieve `userQuery` to `searchQuery` mappings.
      * @throws {Error} - Throws an error if A/B test is active and no AbTestSegmentManager is provided.
      */
-    constructor(config: SmartQueryClientConfig, cache?: Cache) {
+    constructor(config: SmartQueryClientConfig, cache?: ICache) {
         isTenantValidOrThrow(config.tenant);
 
         if (config.isAbTestActive && !config.abTestManager) {

@@ -2,5 +2,5 @@ export {CookieAccess, BrowserCookieAccess, getBrowserCookie, setBrowserCookie, S
 export {AbTestSegment, generateRandomSegment, AbTestSegmentManager, AbTestSegmentManagerConfig} from "./AbTestSegmentManager";
 export {SmartQueryClient, SmartQueryClientConfig} from "./SmartQueryClient";
 export {Suggestion, SmartSuggestClientConfig, SmartSuggestClient} from "./SmartSuggestClient";
-export {Cache} from "./cache/Cache";
+export {ICache} from "./cache/ICache";
 export {SimpleMemoryCache} from "./cache/SimpleMemoryCache";

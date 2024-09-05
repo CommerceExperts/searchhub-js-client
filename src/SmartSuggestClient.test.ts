@@ -1,5 +1,5 @@
 import {SmartSuggestClient, SmartSuggestClientConfig} from './SmartSuggestClient';
-import {Cache} from './cache/Cache';
+import {ICache} from './cache/ICache';
 
 const mockFetch = jest.fn(() =>
     Promise.resolve({
@@ -33,7 +33,7 @@ const mockFetch = jest.fn(() =>
 global.fetch = mockFetch as any;
 
 describe('SmartSuggestClient', () => {
-    let cache: Cache;
+    let cache: ICache;
     let suggestClient: SmartSuggestClient;
 
     beforeEach(() => {

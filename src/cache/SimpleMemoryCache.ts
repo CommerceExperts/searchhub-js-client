@@ -1,3 +1,5 @@
+import {Cache} from "./Cache";
+
 interface CacheItem {
     value: any;
     expiresAt: number; // The timestamp when the item should expire
@@ -9,7 +11,7 @@ interface CacheItem {
  *
  * @class
  */
-export class SimpleMemoryCache {
+export class SimpleMemoryCache implements Cache {
     private cache: Map<string, CacheItem>;
     private readonly defaultTTL: number; // TTL in milliseconds
     private cleanupInterval: NodeJS.Timeout | null = null;

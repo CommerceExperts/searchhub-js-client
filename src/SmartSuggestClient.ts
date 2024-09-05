@@ -1,4 +1,5 @@
 import {isTenantValidOrThrow} from "./util";
+import {Cache} from "./cache/Cache";
 
 /**
  * Configuration interface for SmartSuggestClient.
@@ -28,7 +29,8 @@ export interface Suggestion {
 
 /**
  * SmartSuggestClient handles user queries and provides search suggestions
- * by interacting with the SmartSuggest API.
+ * by interacting with the SmartSuggest API. It can optionally cache the
+ * mapping of `userQuery` to `searchQuery` for future use in SmartQueryClient.
  *
  * @class SmartSuggestClient
  */
@@ -37,14 +39,16 @@ export class SmartSuggestClient {
     private readonly customer: string;
     private readonly channel: string;
     private readonly apiKey: string | undefined;
+    private readonly cache?: Cache;
 
     /**
      * Creates an instance of SmartSuggestClient.
      *
      * @param {SmartSuggestClientConfig} config - Configuration object for SmartSuggestClient.
+     * @param {Cache} [cache] - Optional cache to store `userQuery` to `searchQuery` mappings.
      * @throws {Error} - Throws an error if the tenant is invalid.
      */
-    constructor(config: SmartSuggestClientConfig) {
+    constructor(config: SmartSuggestClientConfig, cache?: Cache) {
         isTenantValidOrThrow(config.tenant);
         // Parse the tenant to retrieve the customer and channel
         this.tenant = config.tenant;
@@ -52,10 +56,12 @@ export class SmartSuggestClient {
         this.customer = split[0];
         this.channel = split[1];
         this.apiKey = config.apiKey;
+        this.cache = cache;  // Optional cache initialization
     }
 
     /**
      * Fetches search suggestions based on the user's query by interacting with the SmartSuggest API.
+     * Optionally stores the `userQuery` to `searchQuery` mapping in the cache.
      *
      * @param {string} userQuery - The search query entered by the user.
      * @returns {Promise<Suggestion[]>} - A promise that resolves to an array of suggestions.
@@ -67,7 +73,6 @@ export class SmartSuggestClient {
             base64Credentials = btoa(this.customer + ":" + this.apiKey);
         }
 
-        // Fetch suggestions from the SmartSuggest API
         return fetch(`https://saas.searchhub.io/smartsuggest/v4/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
             method: "GET",
             headers: base64Credentials ? {
@@ -75,7 +80,12 @@ export class SmartSuggestClient {
             } : undefined
         }).then(res => res.json())
             .then(data => {
-                // TODO pre-cache mapping
+                const {userQuery, searchQuery} = data.mappingTarget;
+
+                // Cache-Eintrag, wenn der Cache existiert
+                if (this.cache) {
+                    this.cache.set(userQuery, searchQuery); // Cache für SmartQueryClient
+                }
 
                 // Map the API response to the Suggestion interface
                 return data.suggestions.map((s: any) => ({

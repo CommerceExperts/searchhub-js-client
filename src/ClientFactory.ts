@@ -1,4 +1,4 @@
-import {CookieAccess} from "./browser/cookies";
+import {CookieAccess} from "./cookies";
 import {SmartQueryClient} from "./SmartQueryClient";
 import {SimpleMemoryCache} from "./cache/SimpleMemoryCache";
 import {AbTestSegmentManager} from "./AbTestSegmentManager";

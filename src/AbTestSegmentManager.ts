@@ -1,4 +1,4 @@
-import {CookieAccess} from "./browser/cookies";
+import {CookieAccess} from "./cookies";
 
 const fiftyTwo = Math.pow(2, -52);
 const twenty = Math.pow(2, 20);
@@ -115,8 +115,8 @@ export class AbTestSegmentManager {
                 }: AbTestSegmentManagerConfig) {
         this.cookieAccess = cookieAccess;
         this.abTestCookieName = abTestCookieName || "_shabT___";
-        this.searchHubSegmentName = searchHubSegmentName || "sh";
-        this.controlSegmentName = controlSegmentName || "c";
+        this.searchHubSegmentName = searchHubSegmentName || AbTestSegment.SEARCHHUB;
+        this.controlSegmentName = controlSegmentName || AbTestSegment.CONTROL;
     }
 
     /**
@@ -124,18 +124,18 @@ export class AbTestSegmentManager {
      * If the A/B test cookie is set, the function assigns a new segment (either "SearchHub" or control)
      * and updates the value in the cookie. Otherwise, no action is taken.
      *
-     * @returns {boolean} - Returns `true` if the segment was successfully assigned, otherwise `false`.
+     * @returns {AbTestSegment | undefined} - Returns {AbTestSegment} if the segment was successfully assigned, otherwise undefined.
      */
-    assignSegment(): boolean {
+    assignSegment(): AbTestSegment | undefined {
         const segment = generateRandomSegment();
-        if (this.cookieAccess.getCookie(this.abTestCookieName) != "") {
+        if (this.cookieAccess.getCookie(this.abTestCookieName) === "") {
             this.cookieAccess.setCookie(
                 this.abTestCookieName,
                 segment === AbTestSegment.SEARCHHUB ? this.searchHubSegmentName : this.controlSegmentName
             );
-            return true;
+            return segment;
         } else {
-            return false;
+            return undefined;
         }
     }
 
@@ -145,7 +145,11 @@ export class AbTestSegmentManager {
      * @returns {boolean} - Returns `true` if the user is in the "SearchHub" segment, otherwise `false`.
      */
     isSearchhubActive(): boolean {
-        const abTestSegment = this.cookieAccess.getCookie(this.abTestCookieName);
+        let abTestSegment = this.cookieAccess.getCookie(this.abTestCookieName);
+        if (!abTestSegment) {
+            abTestSegment = this.assignSegment() as AbTestSegment;
+        }
+
         return abTestSegment === this.searchHubSegmentName;
     }
 }

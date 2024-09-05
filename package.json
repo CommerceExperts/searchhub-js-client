@@ -1,6 +1,6 @@
 {
   "name": "searchhub-js-client",
-  "version": "0.6.0",
+  "version": "0.7.1",
   "description": "searchHub javascript client",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/CommerceExperts/searchhub-js-client#readme",
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.3",
     "clean-webpack-plugin": "^4.0.0",

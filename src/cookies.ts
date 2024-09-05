@@ -1,3 +1,6 @@
+import {Request, Response} from 'express';
+
+
 export const SEARCH_COLLECTOR_SESSION_COOKIE_NAME = "SearchCollectorSession";
 
 export const setBrowserCookie = (name: string, value: string, ttlMinutes ?: number): string => {
@@ -39,6 +42,38 @@ export class BrowserCookieAccess implements CookieAccess {
 
     getCookie(name: string): string {
         return getBrowserCookie(name);
+    }
+}
+
+
+export class ExpressCookieAccess implements CookieAccess {
+    private readonly request;
+    private readonly response;
+    /**
+     * without this store the cookie wont be available after using setCookie
+     * @private
+     */
+    private readonly cookieStore = new Map<string, string>();
+
+    constructor(request: Request, response: Response) {
+        this.request = request;
+        this.response = response;
+    }
+
+    setCookie(name: string, value: string): void {
+        // Set the cookie on the response with default options
+        this.response.cookie(name, value, {
+            httpOnly: true,  // Prevents client-side JavaScript from accessing the cookie
+            secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production
+            sameSite: 'lax',  // Helps to mitigate CSRF attacks
+        });
+        this.cookieStore.set(name, value);
+    }
+
+    getCookie(name: string): string {
+        // Access the cookie from the request object
+        const cookieValue = this.request.cookies[name];
+        return cookieValue || this.cookieStore.get(name) || '';  // Return empty string if cookie doesn't exist
     }
 }
 

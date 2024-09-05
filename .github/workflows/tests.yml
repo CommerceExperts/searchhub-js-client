@@ -1,0 +1,21 @@
+name: tests
+
+on:
+  push:
+    branches-ignore: [ 'master' ]
+  pull_request:
+    types: [ opened, reopened ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      - run: npm ci --silent
+      - run: npm run build:prod --silent
+      - run: npm test

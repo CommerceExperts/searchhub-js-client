@@ -1,13 +1,13 @@
-import {InMemoryCache} from './InMemoryCache';
+import {SimpleMemoryCache} from './SimpleMemoryCache';
 
 jest.useFakeTimers(); // Mocking timers to simulate the TTL expiration behavior
 
 
-describe('InMemoryCache', () => {
-    let cache: InMemoryCache;
+describe('SimpleMemoryCache', () => {
+    let cache: SimpleMemoryCache;
 
     beforeEach(() => {
-        cache = new InMemoryCache(1, 2); // TTL set to 1 second, Cleanup Interval set to 2 seconds
+        cache = new SimpleMemoryCache(1, 2); // TTL set to 1 second, Cleanup Interval set to 2 seconds
     });
 
     afterEach(() => {
@@ -84,11 +84,11 @@ describe('InMemoryCache', () => {
 });
 
 
-describe('InMemoryCache dispose functionality', () => {
-    let cache: InMemoryCache;
+describe('SimpleMemoryCache dispose functionality', () => {
+    let cache: SimpleMemoryCache;
 
     beforeEach(() => {
-        cache = new InMemoryCache(1); // 1 second TTL for easier testing
+        cache = new SimpleMemoryCache(1); // 1 second TTL for easier testing
     });
 
     test('should throw error when using set after dispose', () => {

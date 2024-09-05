@@ -9,7 +9,7 @@ interface CacheItem {
  *
  * @class
  */
-export class InMemoryCache {
+export class SimpleMemoryCache {
     private cache: Map<string, CacheItem>;
     private readonly defaultTTL: number; // TTL in milliseconds
     private cleanupInterval: NodeJS.Timeout | null = null;

@@ -106,6 +106,7 @@ export class SmartQueryClient {
             headers: base64Credentials ? {
                 'Authorization': `Basic ${base64Credentials}`
             } : undefined
-        }).then(res => res.json());
+        }).then(res => res.json())
+            .then(target => ({searchQuery: target.searchQuery, redirect: target.redirect}));
     }
 }

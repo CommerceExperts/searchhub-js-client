@@ -79,7 +79,6 @@ export class SmartQueryClient {
      * @returns {Promise<MappingTarget>} - A promise resolving to the search mapping target, including a possible redirect.
      */
     getMapping(userQuery: string): Promise<MappingTarget> {
-        // Prüfe zuerst, ob die userQuery im Cache existiert, wenn ein Cache vorhanden ist
         if (this.cache) {
             const cachedMapping = this.cache.get(userQuery);
             if (cachedMapping) {
@@ -90,7 +89,6 @@ export class SmartQueryClient {
             }
         }
 
-        // Check if A/B testing is active and the user is not in the SearchHub segment
         if (this.isAbTestActive && this.abTestManager && !this.abTestManager.isSearchhubActive()) {
             return new Promise(res => res({
                 redirect: null,

@@ -10,7 +10,7 @@
     "build": "webpack",
     "merge:dts": "rollup -c rollup.config.js",
     "tmp-dir": "mkdir dist/tmp -p",
-    "clean:dts": "npm run tmp-dir && mv dist/index.d.ts dist/tmp/index_temp.d.ts && rimraf dist/*.d.ts && mv dist/tmp/index_temp.d.ts dist/index.d.ts && rm -rf dist/tmp",
+    "clean:dts": "npm run tmp-dir && mv dist/index.d.ts dist/tmp/index_temp.d.ts && rimraf dist/*.d.ts && mv dist/tmp/index_temp.d.ts dist/index.d.ts && rm -rf dist/tmp && rm -rf dist/browser",
     "build:prod": "npm run build && npm run merge:dts && npm run clean:dts",
     "dev": "webpack-dev-server --mode development",
     "test": ""

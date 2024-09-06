@@ -79,7 +79,7 @@ export class SmartSuggestClient {
             } : undefined
         }).then(res => res.json())
             .then(data => {
-                if (this.cache) {
+                if (this.cache && data.mappingTarget) {
                     const {searchQuery, redirect} = data.mappingTarget;
                     this.cache.set(userQuery, {redirect, searchQuery}); // ICache für SmartQueryClient
                 }

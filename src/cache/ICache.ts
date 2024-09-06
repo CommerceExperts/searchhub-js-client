@@ -1,11 +1,11 @@
-export interface ICache {
+export interface ICache<T> {
     /**
      * Stores a key-value pair in the cache.
      *
      * @param {string} key - The key to store the value under.
      * @param {any} value - The value to store.
      */
-    set(key: string, value: any): void;
+    set(key: string, value: T): void;
 
     /**
      * Retrieves a value from the cache by its key.
@@ -14,7 +14,7 @@ export interface ICache {
      * @param {string} key - The key to retrieve the value for.
      * @returns {any | undefined} - The value if it exists and is not expired, or undefined if not found or expired.
      */
-    get(key: string): any | undefined;
+    get(key: string): T | undefined;
 
     /**
      * Deletes a key-value pair from the cache.

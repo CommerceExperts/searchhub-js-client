@@ -44,7 +44,7 @@ export class SmartQueryClient {
     private readonly channel: string;
     private readonly apiKey: string | undefined;
     private readonly isAbTestActive: boolean;
-    private readonly cache?: ICache;
+    private readonly cache?: ICache<MappingTarget>;
 
     /**
      * Creates an instance of SmartQueryClient.
@@ -53,7 +53,7 @@ export class SmartQueryClient {
      * @param {ICache} [cache] - Optional cache to retrieve `userQuery` to `searchQuery` mappings.
      * @throws {Error} - Throws an error if A/B test is active and no AbTestSegmentManager is provided.
      */
-    constructor(config: SmartQueryClientConfig, cache?: ICache) {
+    constructor(config: SmartQueryClientConfig, cache?: ICache<MappingTarget>) {
         isTenantValidOrThrow(config.tenant);
 
         if (config.isAbTestActive && !config.abTestManager) {
@@ -82,10 +82,7 @@ export class SmartQueryClient {
         if (this.cache) {
             const cachedMapping = this.cache.get(userQuery);
             if (cachedMapping) {
-                return Promise.resolve({
-                    searchQuery: cachedMapping,
-                    redirect: null
-                });
+                return Promise.resolve(cachedMapping);
             }
         }
 
@@ -106,7 +103,13 @@ export class SmartQueryClient {
             headers: base64Credentials ? {
                 'Authorization': `Basic ${base64Credentials}`
             } : undefined
-        }).then(res => res.json())
-            .then(target => ({searchQuery: target.searchQuery, redirect: target.redirect}));
+        }).then(res => res.json()) //TODO handle error when tenant not found
+            .then(target => ({searchQuery: target.searchQuery, redirect: target.redirect}))
+            .then(mapping => {
+                if (this.cache) {
+                    this.cache.set(userQuery, mapping);
+                }
+                return mapping;
+            });
     }
 }

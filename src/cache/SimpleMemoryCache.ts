@@ -1,7 +1,7 @@
 import {ICache} from "./ICache";
 
-interface CacheItem {
-    value: any;
+interface CacheItem<T> {
+    value: T;
     expiresAt: number; // The timestamp when the item should expire
 }
 
@@ -11,8 +11,8 @@ interface CacheItem {
  *
  * @class
  */
-export class SimpleMemoryCache implements ICache {
-    private cache: Map<string, CacheItem>;
+export class SimpleMemoryCache<T> implements ICache<T> {
+    private cache: Map<string, CacheItem<T>>;
     private readonly defaultTTL: number; // TTL in milliseconds
     private cleanupInterval: NodeJS.Timeout | null = null;
     private isDisposed: boolean = false;
@@ -41,13 +41,13 @@ export class SimpleMemoryCache implements ICache {
      * @param {any} value - The value to store.
      * @param {number} [customTTLInSeconds] - Optional. A custom TTL for the specific item in seconds.
      */
-    set(key: string, value: any, customTTLInSeconds?: number): void {
+    set(key: string, value: T, customTTLInSeconds?: number): void {
         this.ensureNotDisposed(); // Check if the cache is disposed
 
         const ttl = customTTLInSeconds ? customTTLInSeconds * 1000 : this.defaultTTL;
         const expiresAt = Date.now() + ttl;
 
-        const item: CacheItem = {
+        const item: CacheItem<T> = {
             value,
             expiresAt,
         };
@@ -62,7 +62,7 @@ export class SimpleMemoryCache implements ICache {
      * @param {string} key - The key to retrieve the value for.
      * @returns {any | undefined} - The value if it exists and is not expired, or undefined if not found or expired.
      */
-    get(key: string): any | undefined {
+    get(key: string): T | undefined {
         this.ensureNotDisposed(); // Check if the cache is disposed
 
         const item = this.cache.get(key);

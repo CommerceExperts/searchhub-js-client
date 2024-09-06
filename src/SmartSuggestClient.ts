@@ -1,5 +1,6 @@
 import {isTenantValidOrThrow} from "./util";
 import {ICache} from "./cache/ICache";
+import {MappingTarget} from "./SmartQueryClient";
 
 /**
  * Configuration interface for SmartSuggestClient.
@@ -39,7 +40,7 @@ export class SmartSuggestClient {
     private readonly customer: string;
     private readonly channel: string;
     private readonly apiKey: string | undefined;
-    private readonly cache?: ICache;
+    private readonly cache?: ICache<MappingTarget>;
 
     /**
      * Creates an instance of SmartSuggestClient.
@@ -48,7 +49,7 @@ export class SmartSuggestClient {
      * @param {ICache} [cache] - Optional cache to store `userQuery` to `searchQuery` mappings.
      * @throws {Error} - Throws an error if the tenant is invalid.
      */
-    constructor(config: SmartSuggestClientConfig, cache?: ICache) {
+    constructor(config: SmartSuggestClientConfig, cache?: ICache<MappingTarget>) {
         isTenantValidOrThrow(config.tenant);
         this.tenant = config.tenant;
         const split = this.tenant.split(".");
@@ -78,10 +79,9 @@ export class SmartSuggestClient {
             } : undefined
         }).then(res => res.json())
             .then(data => {
-                const {userQuery, searchQuery} = data.mappingTarget;
-
                 if (this.cache) {
-                    this.cache.set(userQuery, searchQuery); // ICache für SmartQueryClient
+                    const {searchQuery, redirect} = data.mappingTarget;
+                    this.cache.set(userQuery, {redirect, searchQuery}); // ICache für SmartQueryClient
                 }
 
                 return data.suggestions.map((s: any) => ({

@@ -4,7 +4,7 @@ jest.useFakeTimers(); // Mocking timers to simulate the TTL expiration behavior
 
 
 describe('SimpleMemoryCache', () => {
-    let cache: SimpleMemoryCache;
+    let cache: SimpleMemoryCache<string>;
 
     beforeEach(() => {
         cache = new SimpleMemoryCache(1, 2); // TTL set to 1 second, Cleanup Interval set to 2 seconds
@@ -85,7 +85,7 @@ describe('SimpleMemoryCache', () => {
 
 
 describe('SimpleMemoryCache dispose functionality', () => {
-    let cache: SimpleMemoryCache;
+    let cache: SimpleMemoryCache<string>;
 
     beforeEach(() => {
         cache = new SimpleMemoryCache(1); // 1 second TTL for easier testing

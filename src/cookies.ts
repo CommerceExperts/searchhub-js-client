@@ -1,4 +1,5 @@
 import {Request, Response} from 'express';
+import {CookieOptions} from "express-serve-static-core";
 
 
 export const SEARCH_COLLECTOR_SESSION_COOKIE_NAME = "SearchCollectorSession";
@@ -62,12 +63,19 @@ export class ExpressCookieAccess implements CookieAccess {
 
     setCookie(name: string, value: string): void {
         // Set the cookie on the response with default options
-        this.response.cookie(name, value, {
-            httpOnly: true,  // Prevents client-side JavaScript from accessing the cookie
-            secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production
-            sameSite: 'lax',  // Helps to mitigate CSRF attacks
-        });
+        this.response.cookie(name, value, this.getCookieOptions());
         this.cookieStore.set(name, value);
+    }
+
+    getCookieOptions(): CookieOptions {
+        const expires = new Date();
+        expires.setFullYear(expires.getFullYear() + 1);
+        return {
+            expires,
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+        };
     }
 
     getCookie(name: string): string {

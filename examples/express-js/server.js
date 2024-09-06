@@ -1,6 +1,6 @@
 const express = require('express')
 const cookieParser = require('cookie-parser');
-const {ClientFactory, ExpressCookieAccess} = require("searchhub-js-client");
+const {ExpressJsClientFactory, ExpressCookieAccess} = require("searchhub-js-client");
 
 const app = express();
 app.use(cookieParser());
@@ -9,29 +9,27 @@ const port = 3000;
 
 
 app.get('/smartquery', (req, res) => {
-    const userQuery = req.query.userQuery;
-    const {smartQueryClient} = ClientFactory({
+    const {smartQueryClient} = ExpressJsClientFactory({
         tenant: "your.tenant",
         cookieAccess: new ExpressCookieAccess(req, res),
         abTestActive: true
     });
 
-    smartQueryClient.getMapping(userQuery)
+    smartQueryClient.getMapping(req.query.userQuery)
         .then((result) => {
             res.send(result);
         });
 });
 
 app.get('/smartsuggest', (req, res) => {
-    const userQuery = req.query.userQuery;
-    const {smartSuggestClient, abTestManager} = ClientFactory({
+    const {smartSuggestClient, abTestManager} = ExpressJsClientFactory({
         tenant: "your.tenant",
         cookieAccess: new ExpressCookieAccess(req, res),
         abTestActive: true
     });
 
     if (abTestManager.isSearchhubActive()) {
-        smartSuggestClient.getSuggestions(userQuery)
+        smartSuggestClient.getSuggestions(req.query.userQuery)
             .then((suggestions) => {
                 res.send(suggestions);
             });

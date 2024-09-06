@@ -4,17 +4,36 @@ import {SimpleMemoryCache} from "./cache/SimpleMemoryCache";
 import {AbTestSegmentManager} from "./AbTestSegmentManager";
 import {SmartSuggestClient} from "./SmartSuggestClient";
 
-export const ClientFactory = ({tenant, cookieAccess, apiKey, abTestActive}: { tenant: string, abTestActive: boolean, cookieAccess: CookieAccess, apiKey?: string }) => {
+
+export const BrowserClientFactory = ({tenant, cookieAccess, apiKey, abTestActive}: { tenant: string, abTestActive: boolean, cookieAccess: CookieAccess, apiKey?: string }) => {
     const cache = new SimpleMemoryCache<MappingTarget>(360, 360);
     const abTestSegmentManager = new AbTestSegmentManager({cookieAccess});
 
     const smartQueryClient = new SmartQueryClient({
-        tenant, apiKey,
+        tenant,
+        apiKey,
         isAbTestActive: abTestActive,
         abTestManager: abTestSegmentManager
     }, cache);
 
     const smartSuggestClient = new SmartSuggestClient({tenant, apiKey}, cache);
+    return {
+        smartQueryClient, smartSuggestClient, abTestManager: abTestSegmentManager
+    };
+}
+
+
+export const ExpressJsClientFactory = ({tenant, cookieAccess, apiKey, abTestActive}: { tenant: string, abTestActive: boolean, cookieAccess: CookieAccess, apiKey?: string }) => {
+    const abTestSegmentManager = new AbTestSegmentManager({cookieAccess});
+
+    const smartQueryClient = new SmartQueryClient({
+        tenant,
+        apiKey,
+        isAbTestActive: abTestActive,
+        abTestManager: abTestSegmentManager
+    });
+
+    const smartSuggestClient = new SmartSuggestClient({tenant, apiKey});
     return {
         smartQueryClient, smartSuggestClient, abTestManager: abTestSegmentManager
     };

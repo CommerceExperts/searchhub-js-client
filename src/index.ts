@@ -4,4 +4,4 @@ export {SmartQueryClient, SmartQueryClientConfig, MappingTarget} from "./SmartQu
 export {Suggestion, SmartSuggestClientConfig, SmartSuggestClient} from "./SmartSuggestClient";
 export {ICache} from "./cache/ICache";
 export {SimpleMemoryCache} from "./cache/SimpleMemoryCache";
-export {ClientFactory} from "./ClientFactory";
+export {ExpressJsClientFactory, BrowserClientFactory} from "./ClientFactory";

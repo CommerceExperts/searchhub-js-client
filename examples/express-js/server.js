@@ -1,18 +1,19 @@
 const express = require('express')
 const cookieParser = require('cookie-parser');
 const {ExpressJsClientFactory, ExpressCookieAccess} = require("searchhub-js-client");
-
-const app = express();
-app.use(cookieParser());
+const path = require('path');
 
 const port = 3000;
+const app = express();
 
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/smartquery', (req, res) => {
     const {smartQueryClient} = ExpressJsClientFactory({
         tenant: "your.tenant",
         cookieAccess: new ExpressCookieAccess(req, res),
-        abTestActive: true
+        abTestActive: false
     });
 
     smartQueryClient.getMapping(req.query.userQuery)

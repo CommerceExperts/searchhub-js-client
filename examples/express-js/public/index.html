@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>searchHub JS client demo</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+
+    <style>
+        /* Basic Reset and Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--e-global-color-c7ac31f); /* White background */
+            color: var(--e-global-color-2f40715); /* Black for general text */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--e-global-color-793628c); /* Bright red accent for links */
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Color Palette based on provided values */
+        :root {
+            --primary-color: #2B2D42; /* Dark grey-blue */
+            --secondary-color: #E94749; /* Bright red */
+            --accent-color: #8A3A46; /* Dark red */
+            --text-grey: #707070; /* Grey for secondary text */
+            --black-color: #000000; /* Black */
+            --white-color: #FFFFFF; /* White */
+        }
+
+        /* Container for the entire content */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Header with logo and slogan */
+        header {
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-top: 20px;
+            color: var(--primary-color);
+        }
+
+        header p {
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin-top: 10px;
+        }
+
+        /* Input Search Field */
+        #searchBox {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid var(--primary-color); /* Primary border */
+            border-radius: 8px;
+            margin-bottom: 40px;
+            background-color: var(--white-color); /* White background */
+            color: var(--black-color); /* Black text */
+        }
+
+        #searchBox:focus {
+            outline: none;
+            border-color: var(--secondary-color); /* Secondary color when focused */
+        }
+
+        /* Flexbox for Smart Suggest and Smart Query */
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            background-color: var(--primary-color); /* Primary color for box background */
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 45%;
+            flex: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            color: var(--white-color); /* White text inside boxes */
+            text-align: left;
+        }
+
+        .box h1 {
+            font-size: 22px;
+            border-bottom: 2px solid var(--secondary-color); /* Secondary color border */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--secondary-color); /* Secondary color for titles */
+        }
+
+        .suggestion-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--text-grey);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item a {
+            font-size: 18px;
+        }
+
+        .query-result {
+            font-size: 16px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 50px;
+            font-size: 14px;
+            color: var(--text-grey); /* Text grey for footer */
+            text-align: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .box {
+                max-width: 100%;
+            }
+        }
+    </style>
+    <script src="/searchhub-js-client/index.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header with Logo and Title -->
+    <header>
+        <div style="background: var(--primary-color);height: 180px">
+            <img height="180px" src="https://www.searchhub.io/wp-content/uploads/2022/08/SearchHubIcon_whitelossles-700x1024.webp" alt="SearchHub Logo">
+        </div>
+        <h1>smartSuggest and smartQuery Demo</h1>
+    </header>
+
+    <!-- Search Input -->
+    <label>
+        <input id="searchBox" type="search" placeholder="Type something..."/>
+    </label>
+
+    <!-- Flex Container for Smart Suggest and Smart Query -->
+    <div class="flex-container">
+        <div class="box">
+            <h1>Smart Suggest</h1>
+            <div id="suggestRenderTarget">Your suggestions will appear here...</div>
+        </div>
+
+        <div class="box">
+            <h1>Smart Query</h1>
+            <div id="queryRenderTarget">Your query result will appear here...</div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    © 2024 searchHub - AI Add-On Optimizing your Existing Onsite Search
+</footer>
+
+<script>
+    const {BrowserClientFactory} = searchHubClient;
+
+    const {smartSuggestClient, smartQueryClient, abTestManager} = BrowserClientFactory({tenant: "your.tenant", abTestActive: false});
+
+    const suggestRenderTarget = document.querySelector("#suggestRenderTarget");
+    const queryRenderTarget = document.querySelector("#queryRenderTarget");
+
+    document.querySelector("#searchBox").addEventListener("input", e => {
+        const userQuery = e.target.value;
+
+        smartSuggestClient.getSuggestions(userQuery).then(suggestions => {
+            if (suggestions.length === 0) {
+                suggestRenderTarget.innerHTML = "No suggestions found.";
+                return;
+            }
+
+            suggestRenderTarget.innerHTML = suggestions.map(suggestion => `
+                <div class="suggestion-item">
+                    <a href="#">${suggestion.suggestion}</a>
+                </div>
+            `).join('');
+        });
+    });
+
+    document.querySelector("#searchBox").addEventListener('keyup', function (e) {
+        if (e.key === 'Enter') {
+            smartQueryClient.getMapping(e.target.value)
+                .then(mapping => {
+                    queryRenderTarget.innerHTML = `
+                        <div class="query-result">
+                            ${JSON.stringify(mapping, null, 2)}
+                        </div>
+                    `;
+                });
+        }
+    });
+</script>
+
+</body>
+</html>

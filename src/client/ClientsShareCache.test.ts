@@ -1,5 +1,5 @@
 import {SmartSuggestClient, SmartSuggestClientConfig} from './SmartSuggestClient';
-import {SmartQueryClient, SmartQueryClientConfig} from './SmartQueryClient';
+import {MappingTarget, SmartQueryClient, SmartQueryClientConfig} from './SmartQueryClient';
 import {ICache} from '../cache/ICache';
 
 const mockFetch = jest.fn(() =>
@@ -34,7 +34,7 @@ const mockFetch = jest.fn(() =>
 global.fetch = mockFetch as any;
 
 describe('Integration test between SmartSuggestClient and SmartQueryClient', () => {
-    let cache: ICache;
+    let cache: ICache<MappingTarget>;
     let suggestClient: SmartSuggestClient;
     let queryClient: SmartQueryClient;
 
@@ -58,10 +58,13 @@ describe('Integration test between SmartSuggestClient and SmartQueryClient', () 
     test('SmartQueryClient should use the cache entry from SmartSuggestClient', async () => {
         // Simulate calling SmartSuggestClient, which should store an entry in the cache
         await suggestClient.getSuggestions('test query');
-        expect(cache.set).toHaveBeenCalledWith('test query', 'mapped query');
+        expect(cache.set).toHaveBeenCalledWith('test query', {searchQuery: 'mapped query', redirect: null});
 
         // Simulate a cache hit in SmartQueryClient
-        cache.get = jest.fn(() => 'mapped query');
+        cache.get = jest.fn(() => ({
+            redirect: null,
+            searchQuery: 'mapped query'
+        }));
 
         // Ensure SmartQueryClient uses the cache entry
         const result = await queryClient.getMapping('test query');

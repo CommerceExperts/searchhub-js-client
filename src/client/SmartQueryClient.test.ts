@@ -1,4 +1,4 @@
-import {SmartQueryClient, SmartQueryClientConfig} from './SmartQueryClient';
+import {MappingTarget, SmartQueryClient, SmartQueryClientConfig} from './SmartQueryClient';
 import {ICache} from '../cache/ICache';
 
 
@@ -14,7 +14,7 @@ const mockFetch = jest.fn(() =>
 global.fetch = mockFetch as any;
 
 describe('SmartQueryClient', () => {
-    let cache: ICache;
+    let cache: ICache<MappingTarget>;
     let queryClient: SmartQueryClient;
 
     beforeEach(() => {
@@ -30,7 +30,10 @@ describe('SmartQueryClient', () => {
     });
 
     test('should return cache hit if available', async () => {
-        cache.get = jest.fn(() => 'cached query');
+        cache.get = jest.fn(() => ({
+            searchQuery: 'cached query',
+            redirect: null
+        }));
         const result = await queryClient.getMapping('test query');
         expect(result.searchQuery).toBe('cached query');
     });

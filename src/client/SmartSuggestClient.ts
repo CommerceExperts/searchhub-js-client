@@ -81,7 +81,7 @@ export class SmartSuggestClient {
             .then(data => {
                 if (this.cache && data.mappingTarget) {
                     const {searchQuery, redirect} = data.mappingTarget;
-                    this.cache.set(userQuery, {redirect, searchQuery}); // ICache für SmartQueryClient
+                    this.cache.set(userQuery, {redirect: redirect || null, searchQuery}); // ICache für SmartQueryClient
                 }
 
                 return data.suggestions.map((s: any) => ({

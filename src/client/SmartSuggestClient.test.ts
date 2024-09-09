@@ -1,5 +1,6 @@
 import {SmartSuggestClient, SmartSuggestClientConfig} from './SmartSuggestClient';
 import {ICache} from '../cache/ICache';
+import {MappingTarget} from "./SmartQueryClient";
 
 const mockFetch = jest.fn(() =>
     Promise.resolve({
@@ -33,7 +34,7 @@ const mockFetch = jest.fn(() =>
 global.fetch = mockFetch as any;
 
 describe('SmartSuggestClient', () => {
-    let cache: ICache;
+    let cache: ICache<MappingTarget>;
     let suggestClient: SmartSuggestClient;
 
     beforeEach(() => {
@@ -50,7 +51,7 @@ describe('SmartSuggestClient', () => {
 
     test('should store userQuery and searchQuery in cache', async () => {
         await suggestClient.getSuggestions('test query');
-        expect(cache.set).toHaveBeenCalledWith('test query', 'mapped query');
+        expect(cache.set).toHaveBeenCalledWith('test query', {searchQuery: 'mapped query', redirect: null});
     });
 
     test('should fetch suggestions without cache', async () => {

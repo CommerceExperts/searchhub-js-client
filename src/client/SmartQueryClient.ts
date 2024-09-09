@@ -104,7 +104,7 @@ export class SmartQueryClient {
                 'Authorization': `Basic ${base64Credentials}`
             } : undefined
         }).then(res => res.json()) //TODO handle error when tenant not found
-            .then(target => ({searchQuery: target.searchQuery, redirect: target.redirect}))
+            .then(target => ({searchQuery: target.searchQuery, redirect: target.redirect || null}))
             .then(mapping => {
                 if (this.cache) {
                     this.cache.set(userQuery, mapping);

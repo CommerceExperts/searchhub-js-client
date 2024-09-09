@@ -1,5 +1,5 @@
 import {SmartQueryClient, SmartQueryClientConfig} from './SmartQueryClient';
-import {ICache} from './cache/ICache';
+import {ICache} from '../cache/ICache';
 
 
 const mockFetch = jest.fn(() =>

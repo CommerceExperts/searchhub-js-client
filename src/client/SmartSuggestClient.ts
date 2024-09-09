@@ -1,5 +1,5 @@
-import {isTenantValidOrThrow} from "./util";
-import {ICache} from "./cache/ICache";
+import {isTenantValidOrThrow} from "../util";
+import {ICache} from "../cache/ICache";
 import {MappingTarget} from "./SmartQueryClient";
 
 /**

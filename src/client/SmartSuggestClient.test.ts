@@ -1,5 +1,5 @@
 import {SmartSuggestClient, SmartSuggestClientConfig} from './SmartSuggestClient';
-import {ICache} from './cache/ICache';
+import {ICache} from '../cache/ICache';
 
 const mockFetch = jest.fn(() =>
     Promise.resolve({

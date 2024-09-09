@@ -1,19 +1,17 @@
 import {AbTestSegmentManager, AbTestSegment, generateRandomSegment, random} from './AbTestSegmentManager';
-import {CookieAccess} from './cookies';
+import {CookieAccess} from '../cookies';
 
 describe('AbTestSegmentManager Tests', () => {
 
     let mockCookieAccess: CookieAccess;
 
     beforeEach(() => {
+        jest.restoreAllMocks();
+
         mockCookieAccess = {
             getCookie: jest.fn().mockReturnValue(''),
             setCookie: jest.fn(),
         };
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
     });
 
     it('should assign a random segment', () => {

@@ -1,4 +1,4 @@
-import {CookieAccess} from "./cookies";
+import {CookieAccess} from "../cookies";
 
 const fiftyTwo = Math.pow(2, -52);
 const twenty = Math.pow(2, 20);

@@ -1,4 +1,4 @@
-import {AbTestSegmentManager} from "../AbTestSegmentManager";
+import {AbTestSegmentManager} from "../abtest/AbTestSegmentManager";
 import {isTenantValidOrThrow} from "../util";
 import {ICache} from "src/cache/ICache";
 

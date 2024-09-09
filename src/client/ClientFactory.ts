@@ -1,7 +1,7 @@
 import {BrowserCookieAccess, CookieAccess} from "../cookies";
 import {MappingTarget, SmartQueryClient} from "./SmartQueryClient";
 import {SimpleMemoryCache} from "../cache/SimpleMemoryCache";
-import {AbTestSegmentManager} from "../AbTestSegmentManager";
+import {AbTestSegmentManager} from "../abtest/AbTestSegmentManager";
 import {SmartSuggestClient} from "./SmartSuggestClient";
 
 

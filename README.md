@@ -8,17 +8,20 @@
 
 `npm i -S searchhub-js-client`
 
+# Demos
+
+Checkout the [examples](https://github.com/CommerceExperts/searchhub-js-client/tree/main/examples) folder for a backend and frontend integration demo
+
 # Usage
 
-recommended way
+recommended browser example
 
 ```typescript
-import {BrowserCookieAccess, ClientFactory} from "searchhub-js-client";
+import {ClientFactory} from "searchhub-js-client";
 
-const {smartSuggestClient, smartQueryClient, abTestManager} = ClientFactory({
-    tenant: "your.tenant",
-    cookieAccess: new BrowserCookieAccess(),
-    abTestActive: true
+const {smartSuggestClient, smartQueryClient, abTestManager} = BrowserClientFactory({
+    tenant: "{YOUR}.{TENANT}",
+    abTestActive: false
 });
 
 
@@ -29,80 +32,41 @@ if (abTestManager.isSearchhubActive()) {
     // use your own as you type suggest endpoint
 }
 
-// automatically respects ab test assignment
+// automatically respects ab test assignment + caching
 const mapping = await smartQueryClient.getMapping("jeanss");
 ```
 
-smartSuggest
+Recommended backend example (expressJs)
 
 ```typescript
-import {SmartSuggestClient} from "searchhub-js-client";
+const express = require('express')
+const cookieParser = require('cookie-parser');
+const {ExpressJsClientFactory, ExpressCookieAccess} = require("searchhub-js-client");
+const path = require('path');
 
-const smartSuggestClient = new SmartSuggestClient({tenant: "your.tenant"});
-const suggestions = await smartSuggestClient.getSuggestions("jeannss");
-```
+const port = 3000;
+const app = express();
 
-smartQuery
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-```typescript
-import {SmartQueryClient} from "searchhub-js-client";
+const tenant = "{YOUR}.{TENANT}";
+const abTestActive = false;
 
-const smartQueryClient = new SmartQueryClient({tenant: "your.tenant", isAbTestActive: false});
-const mapping = await smartQueryClient.getMapping("jeannss");
+app.get('/smartquery', (req, res) => {
+    /**
+     * For the AB test to work we need to create a client per request.
+     */
+    const {smartQueryClient} = ExpressJsClientFactory({
+        tenant,
+        abTestActive,
+        cookieAccess: new ExpressCookieAccess(req, res)
+    });
 
-mapping.searchQuery // use the new query to pass on to your search engine
-```
-
-caching optimized usage
-
-```typescript
-import {SmartQueryClient, SmartSuggestClient, SimpleMemoryCache} from "searchhub-js-client";
-
-const simpleMemoryCache = new SimpleMemoryCache(360, 360);
-
-const smartSuggestClient = new SmartSuggestClient({tenant: "your.tenant"}, simpleMemoryCache);
-const suggestions = await smartSuggestClient.getSuggestions("jeannss");
-
-const smartQueryClient = new SmartQueryClient({tenant: "your.tenant", isAbTestActive: false}, simpleMemoryCache);
-
-// this will be a cache hit because we already know the mapping from the smartSuggest endpoint
-const mapping = await smartQueryClient.getMapping("jeannss");
-```
-
-AB testing with `SmartQueryClient`
-```typescript
-import {AbTestSegmentManager, BrowserCookieAccess, SmartQueryClient} from "searchhub-js-client";
-
-const abTestSegmentManager = new AbTestSegmentManager({
-    cookieAccess: new BrowserCookieAccess()
+    smartQueryClient.getMapping(req.query.userQuery)
+        .then((result) => {
+            res.send(result);
+        });
 });
-
-const smartQueryClient = new SmartQueryClient({
-    tenant: "your.tenant",
-    isAbTestActive: true,
-    abTestManager: abTestSegmentManager
-});
-
-// automatically returns the provided user query if the session is in control segment or retrieves the new query from searchHub endpoint if the session is assigned to the searchHub segment
-const mapping = await smartQueryClient.getMapping("jeannss");
 ```
 
-AB testing with `SmartSuggestClient`
-```typescript
-import {AbTestSegmentManager, BrowserCookieAccess, SmartSuggestClient} from "searchhub-js-client";
-
-const abTestSegmentManager = new AbTestSegmentManager({
-    cookieAccess: new BrowserCookieAccess()
-});
-
-const smartSuggestClient = new SmartSuggestClient({
-    tenant: "your.tenant"
-});
-
-if (abTestSegmentManager.isSearchhubActive()) {
-    // use smartSuggest
-    smartSuggestClient.getSuggestions("userQuery");
-} else {
-    // use your own as you type suggest endpoint 
-}
-```

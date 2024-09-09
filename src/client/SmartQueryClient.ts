@@ -101,9 +101,21 @@ export class SmartQueryClient {
         return fetch(`https://saas.searchhub.io/smartquery/v2/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
             method: "GET",
             headers: base64Credentials ? {
-                'Authorization': `Basic ${base64Credentials}`
-            } : undefined
-        }).then(res => res.json()) //TODO handle error when tenant not found
+                'Authorization': `Basic ${base64Credentials}`,
+                'Accept': 'application/json',
+            } : {
+                'Accept': 'application/json',
+            }
+        })
+            .then(response => {
+                if (response.status === 404) {
+                    throw new Error('Resource not found (404). Please check your tenant configuration');
+                } else if (!response.ok) {
+                    throw new Error(`Unexpected error: status ${response.status}`);
+                }
+                return response.json();
+
+            })
             .then(target => ({searchQuery: target.searchQuery, redirect: target.redirect || null}))
             .then(mapping => {
                 if (this.cache) {

@@ -11,10 +11,10 @@
 return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/AbTestSegmentManager.ts":
-/*!*************************************!*\
-  !*** ./src/AbTestSegmentManager.ts ***!
-  \*************************************/
+/***/ "./src/abtest/AbTestSegmentManager.ts":
+/*!********************************************!*\
+  !*** ./src/abtest/AbTestSegmentManager.ts ***!
+  \********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -22,7 +22,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AbTestSegment: () => (/* binding */ AbTestSegment),
 /* harmony export */   AbTestSegmentManager: () => (/* binding */ AbTestSegmentManager),
-/* harmony export */   generateRandomSegment: () => (/* binding */ generateRandomSegment)
+/* harmony export */   generateRandomSegment: () => (/* binding */ generateRandomSegment),
+/* harmony export */   random: () => (/* binding */ random)
 /* harmony export */ });
 const fiftyTwo = Math.pow(2, -52);
 const twenty = Math.pow(2, 20);
@@ -42,7 +43,7 @@ const random = () => {
         else if (true) {
             // Node.js environment: require crypto module
             try {
-                cryptoModule = __webpack_require__(/*! crypto */ "?fe02");
+                cryptoModule = __webpack_require__(/*! crypto */ "?ab08");
             }
             catch (e) {
                 console.error("Failed to load Node.js crypto module, falling back to Math.random()");
@@ -156,217 +157,6 @@ class AbTestSegmentManager {
 
 /***/ }),
 
-/***/ "./src/ClientFactory.ts":
-/*!******************************!*\
-  !*** ./src/ClientFactory.ts ***!
-  \******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   BrowserClientFactory: () => (/* binding */ BrowserClientFactory),
-/* harmony export */   ExpressJsClientFactory: () => (/* binding */ ExpressJsClientFactory)
-/* harmony export */ });
-/* harmony import */ var _cookies__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cookies */ "./src/cookies.ts");
-/* harmony import */ var _SmartQueryClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SmartQueryClient */ "./src/SmartQueryClient.ts");
-/* harmony import */ var _cache_SimpleMemoryCache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cache/SimpleMemoryCache */ "./src/cache/SimpleMemoryCache.ts");
-/* harmony import */ var _AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AbTestSegmentManager */ "./src/AbTestSegmentManager.ts");
-/* harmony import */ var _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SmartSuggestClient */ "./src/SmartSuggestClient.ts");
-
-
-
-
-
-const BrowserClientFactory = ({ tenant, apiKey, abTestActive }) => {
-    const cache = new _cache_SimpleMemoryCache__WEBPACK_IMPORTED_MODULE_2__.SimpleMemoryCache(360, 360);
-    const abTestSegmentManager = new _AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_3__.AbTestSegmentManager({ cookieAccess: new _cookies__WEBPACK_IMPORTED_MODULE_0__.BrowserCookieAccess() });
-    const smartQueryClient = new _SmartQueryClient__WEBPACK_IMPORTED_MODULE_1__.SmartQueryClient({
-        tenant,
-        apiKey,
-        isAbTestActive: abTestActive,
-        abTestManager: abTestSegmentManager
-    }, cache);
-    const smartSuggestClient = new _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_4__.SmartSuggestClient({ tenant, apiKey }, cache);
-    return {
-        smartQueryClient, smartSuggestClient, abTestManager: abTestSegmentManager
-    };
-};
-const ExpressJsClientFactory = ({ tenant, cookieAccess, apiKey, abTestActive }) => {
-    const abTestSegmentManager = new _AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_3__.AbTestSegmentManager({ cookieAccess });
-    const smartQueryClient = new _SmartQueryClient__WEBPACK_IMPORTED_MODULE_1__.SmartQueryClient({
-        tenant,
-        apiKey,
-        isAbTestActive: abTestActive,
-        abTestManager: abTestSegmentManager
-    });
-    const smartSuggestClient = new _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_4__.SmartSuggestClient({ tenant, apiKey });
-    return {
-        smartQueryClient, smartSuggestClient, abTestManager: abTestSegmentManager
-    };
-};
-
-
-/***/ }),
-
-/***/ "./src/SmartQueryClient.ts":
-/*!*********************************!*\
-  !*** ./src/SmartQueryClient.ts ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   SmartQueryClient: () => (/* binding */ SmartQueryClient)
-/* harmony export */ });
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.ts");
-
-/**
- * SmartQueryClient handles user queries by interacting with a remote smart query service.
- * It supports A/B testing to redirect or modify queries based on user segments. The client
- * can also retrieve cached mapping results if available.
- *
- * @class SmartQueryClient
- */
-class SmartQueryClient {
-    /**
-     * Creates an instance of SmartQueryClient.
-     *
-     * @param {SmartQueryClientConfig} config - Configuration object for SmartQueryClient.
-     * @param {ICache} [cache] - Optional cache to retrieve `userQuery` to `searchQuery` mappings.
-     * @throws {Error} - Throws an error if A/B test is active and no AbTestSegmentManager is provided.
-     */
-    constructor(config, cache) {
-        (0,_util__WEBPACK_IMPORTED_MODULE_0__.isTenantValidOrThrow)(config.tenant);
-        if (config.isAbTestActive && !config.abTestManager) {
-            throw new Error("you need to specify a cookieAccess when abTestActive flag is set to true");
-        }
-        this.isAbTestActive = config.isAbTestActive;
-        this.abTestManager = config.abTestManager;
-        this.tenant = config.tenant;
-        const split = this.tenant.split(".");
-        this.customer = split[0];
-        this.channel = split[1];
-        this.apiKey = config.apiKey;
-        this.cache = cache; // Optional cache initialization
-    }
-    /**
-     * Retrieves a mapping result for a user's search query by interacting with the SmartQuery API.
-     * If A/B testing is active and the user is not in the "SearchHub" segment, the provided user query is returned instead.
-     * If a cached mapping exists for the `userQuery`, it will be returned without making an API call.
-     *
-     * @param {string} userQuery - The search query entered by the user.
-     * @returns {Promise<MappingTarget>} - A promise resolving to the search mapping target, including a possible redirect.
-     */
-    getMapping(userQuery) {
-        if (this.cache) {
-            const cachedMapping = this.cache.get(userQuery);
-            if (cachedMapping) {
-                return Promise.resolve(cachedMapping);
-            }
-        }
-        if (this.isAbTestActive && this.abTestManager && !this.abTestManager.isSearchhubActive()) {
-            return new Promise(res => res({
-                redirect: null,
-                searchQuery: userQuery
-            }));
-        }
-        let base64Credentials;
-        if (this.apiKey) {
-            base64Credentials = btoa(this.customer + ":" + this.apiKey);
-        }
-        return fetch(`https://saas.searchhub.io/smartquery/v2/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
-            method: "GET",
-            headers: base64Credentials ? {
-                'Authorization': `Basic ${base64Credentials}`
-            } : undefined
-        }).then(res => res.json()) //TODO handle error when tenant not found
-            .then(target => ({ searchQuery: target.searchQuery, redirect: target.redirect }))
-            .then(mapping => {
-            if (this.cache) {
-                this.cache.set(userQuery, mapping);
-            }
-            return mapping;
-        });
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/SmartSuggestClient.ts":
-/*!***********************************!*\
-  !*** ./src/SmartSuggestClient.ts ***!
-  \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   SmartSuggestClient: () => (/* binding */ SmartSuggestClient)
-/* harmony export */ });
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.ts");
-
-/**
- * SmartSuggestClient handles user queries and provides search suggestions
- * by interacting with the SmartSuggest API. It can optionally cache the
- * mapping of `userQuery` to `searchQuery` for future use in SmartQueryClient.
- *
- * @class SmartSuggestClient
- */
-class SmartSuggestClient {
-    /**
-     * Creates an instance of SmartSuggestClient.
-     *
-     * @param {SmartSuggestClientConfig} config - Configuration object for SmartSuggestClient.
-     * @param {ICache} [cache] - Optional cache to store `userQuery` to `searchQuery` mappings.
-     * @throws {Error} - Throws an error if the tenant is invalid.
-     */
-    constructor(config, cache) {
-        (0,_util__WEBPACK_IMPORTED_MODULE_0__.isTenantValidOrThrow)(config.tenant);
-        this.tenant = config.tenant;
-        const split = this.tenant.split(".");
-        this.customer = split[0];
-        this.channel = split[1];
-        this.apiKey = config.apiKey;
-        this.cache = cache; // Optional cache initialization
-    }
-    /**
-     * Fetches search suggestions based on the user's query by interacting with the SmartSuggest API.
-     * Optionally stores the `userQuery` to `searchQuery` mapping in the cache.
-     *
-     * @param {string} userQuery - The search query entered by the user.
-     * @returns {Promise<Suggestion[]>} - A promise that resolves to an array of suggestions.
-     */
-    getSuggestions(userQuery) {
-        let base64Credentials;
-        if (this.apiKey) {
-            base64Credentials = btoa(this.customer + ":" + this.apiKey);
-        }
-        return fetch(`https://saas.searchhub.io/smartsuggest/v4/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
-            method: "GET",
-            headers: base64Credentials ? {
-                'Authorization': `Basic ${base64Credentials}`
-            } : undefined
-        }).then(res => res.json())
-            .then(data => {
-            if (this.cache && data.mappingTarget) {
-                const { searchQuery, redirect } = data.mappingTarget;
-                this.cache.set(userQuery, { redirect, searchQuery }); // ICache für SmartQueryClient
-            }
-            return data.suggestions.map((s) => ({
-                suggestion: s.suggestion,
-                searchQuery: s.payload["mappingTarget.searchQuery"],
-                redirect: s.payload["mappingTarget.redirect"] || null,
-            }));
-        });
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/cache/SimpleMemoryCache.ts":
 /*!****************************************!*\
   !*** ./src/cache/SimpleMemoryCache.ts ***!
@@ -388,7 +178,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 /**
- * InMemoryCache provides an in-memory key-value store with a TTL (Time-To-Live)
+ * SimpleMemoryCache provides an in-memory key-value store with a TTL (Time-To-Live)
  * for each entry and an optional periodic cleanup process to remove expired items.
  *
  * @class
@@ -530,6 +320,244 @@ class SimpleMemoryCache {
 
 /***/ }),
 
+/***/ "./src/client/ClientFactory.ts":
+/*!*************************************!*\
+  !*** ./src/client/ClientFactory.ts ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   BrowserClientFactory: () => (/* binding */ BrowserClientFactory),
+/* harmony export */   ExpressJsClientFactory: () => (/* binding */ ExpressJsClientFactory)
+/* harmony export */ });
+/* harmony import */ var _cookies__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../cookies */ "./src/cookies.ts");
+/* harmony import */ var _SmartQueryClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SmartQueryClient */ "./src/client/SmartQueryClient.ts");
+/* harmony import */ var _cache_SimpleMemoryCache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../cache/SimpleMemoryCache */ "./src/cache/SimpleMemoryCache.ts");
+/* harmony import */ var _abtest_AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../abtest/AbTestSegmentManager */ "./src/abtest/AbTestSegmentManager.ts");
+/* harmony import */ var _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SmartSuggestClient */ "./src/client/SmartSuggestClient.ts");
+
+
+
+
+
+const BrowserClientFactory = ({ tenant, apiKey, abTestActive }) => {
+    const cache = new _cache_SimpleMemoryCache__WEBPACK_IMPORTED_MODULE_2__.SimpleMemoryCache(360, 360);
+    const abTestSegmentManager = new _abtest_AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_3__.AbTestSegmentManager({ cookieAccess: new _cookies__WEBPACK_IMPORTED_MODULE_0__.BrowserCookieAccess() });
+    const smartQueryClient = new _SmartQueryClient__WEBPACK_IMPORTED_MODULE_1__.SmartQueryClient({
+        tenant,
+        apiKey,
+        isAbTestActive: abTestActive,
+        abTestManager: abTestSegmentManager
+    }, cache);
+    const smartSuggestClient = new _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_4__.SmartSuggestClient({ tenant, apiKey }, cache);
+    return {
+        smartQueryClient, smartSuggestClient, abTestManager: abTestSegmentManager
+    };
+};
+const ExpressJsClientFactory = ({ tenant, cookieAccess, apiKey, abTestActive }) => {
+    const abTestSegmentManager = new _abtest_AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_3__.AbTestSegmentManager({ cookieAccess });
+    const smartQueryClient = new _SmartQueryClient__WEBPACK_IMPORTED_MODULE_1__.SmartQueryClient({
+        tenant,
+        apiKey,
+        isAbTestActive: abTestActive,
+        abTestManager: abTestSegmentManager
+    });
+    const smartSuggestClient = new _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_4__.SmartSuggestClient({ tenant, apiKey });
+    return {
+        smartQueryClient, smartSuggestClient, abTestManager: abTestSegmentManager
+    };
+};
+
+
+/***/ }),
+
+/***/ "./src/client/SmartQueryClient.ts":
+/*!****************************************!*\
+  !*** ./src/client/SmartQueryClient.ts ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   SmartQueryClient: () => (/* binding */ SmartQueryClient)
+/* harmony export */ });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util */ "./src/util.ts");
+
+/**
+ * SmartQueryClient handles user queries by interacting with a remote smart query service.
+ * It supports A/B testing to redirect or modify queries based on user segments. The client
+ * can also retrieve cached mapping results if available.
+ *
+ * @class SmartQueryClient
+ */
+class SmartQueryClient {
+    /**
+     * Creates an instance of SmartQueryClient.
+     *
+     * @param {SmartQueryClientConfig} config - Configuration object for SmartQueryClient.
+     * @param {ICache} [cache] - Optional cache to retrieve `userQuery` to `searchQuery` mappings.
+     * @throws {Error} - Throws an error if A/B test is active and no AbTestSegmentManager is provided.
+     */
+    constructor(config, cache) {
+        (0,_util__WEBPACK_IMPORTED_MODULE_0__.isTenantValidOrThrow)(config.tenant);
+        if (config.isAbTestActive && !config.abTestManager) {
+            throw new Error("you need to specify a cookieAccess when abTestActive flag is set to true");
+        }
+        this.isAbTestActive = config.isAbTestActive;
+        this.abTestManager = config.abTestManager;
+        this.tenant = config.tenant;
+        const split = this.tenant.split(".");
+        this.customer = split[0];
+        this.channel = split[1];
+        this.apiKey = config.apiKey;
+        this.cache = cache; // Optional cache initialization
+    }
+    /**
+     * Retrieves a mapping result for a user's search query by interacting with the SmartQuery API.
+     * If A/B testing is active and the user is not in the "SearchHub" segment, the provided user query is returned instead.
+     * If a cached mapping exists for the `userQuery`, it will be returned without making an API call.
+     *
+     * @param {string} userQuery - The search query entered by the user.
+     * @returns {Promise<MappingTarget>} - A promise resolving to the search mapping target, including a possible redirect.
+     */
+    getMapping(userQuery) {
+        if (this.cache) {
+            const cachedMapping = this.cache.get(userQuery);
+            if (cachedMapping) {
+                return Promise.resolve(cachedMapping);
+            }
+        }
+        if (this.isAbTestActive && this.abTestManager && !this.abTestManager.isSearchhubActive()) {
+            return new Promise(res => res({
+                redirect: null,
+                searchQuery: userQuery
+            }));
+        }
+        let base64Credentials;
+        if (this.apiKey) {
+            base64Credentials = btoa(this.customer + ":" + this.apiKey);
+        }
+        return fetch(`https://saas.searchhub.io/smartquery/v2/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
+            method: "GET",
+            headers: base64Credentials ? {
+                'Authorization': `Basic ${base64Credentials}`,
+                'Accept': 'application/json',
+            } : {
+                'Accept': 'application/json',
+            }
+        })
+            .then(response => {
+            if (response.status === 404) {
+                throw new Error('Resource not found (404)');
+            }
+            else if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+            .then(target => ({ searchQuery: target.searchQuery, redirect: target.redirect || null }))
+            .then(mapping => {
+            if (this.cache) {
+                this.cache.set(userQuery, mapping);
+            }
+            return mapping;
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/client/SmartSuggestClient.ts":
+/*!******************************************!*\
+  !*** ./src/client/SmartSuggestClient.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   SmartSuggestClient: () => (/* binding */ SmartSuggestClient)
+/* harmony export */ });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util */ "./src/util.ts");
+
+/**
+ * SmartSuggestClient handles user queries and provides search suggestions
+ * by interacting with the SmartSuggest API. It can optionally cache the
+ * mapping of `userQuery` to `searchQuery` for future use in SmartQueryClient.
+ *
+ * @class SmartSuggestClient
+ */
+class SmartSuggestClient {
+    /**
+     * Creates an instance of SmartSuggestClient.
+     *
+     * @param {SmartSuggestClientConfig} config - Configuration object for SmartSuggestClient.
+     * @param {ICache} [cache] - Optional cache to store `userQuery` to `searchQuery` mappings.
+     * @throws {Error} - Throws an error if the tenant is invalid.
+     */
+    constructor(config, cache) {
+        (0,_util__WEBPACK_IMPORTED_MODULE_0__.isTenantValidOrThrow)(config.tenant);
+        this.tenant = config.tenant;
+        const split = this.tenant.split(".");
+        this.customer = split[0];
+        this.channel = split[1];
+        this.apiKey = config.apiKey;
+        this.cache = cache; // Optional cache initialization
+    }
+    /**
+     * Fetches search suggestions based on the user's query by interacting with the SmartSuggest API.
+     * Optionally stores the `userQuery` to `searchQuery` mapping in the cache.
+     *
+     * @param {string} userQuery - The search query entered by the user.
+     * @returns {Promise<Suggestion[]>} - A promise that resolves to an array of suggestions.
+     */
+    getSuggestions(userQuery) {
+        let base64Credentials;
+        if (this.apiKey) {
+            base64Credentials = btoa(this.customer + ":" + this.apiKey);
+        }
+        return fetch(`https://saas.searchhub.io/smartsuggest/v4/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
+            method: "GET",
+            headers: base64Credentials ? {
+                'Authorization': `Basic ${base64Credentials}`,
+                'Accept': 'application/json',
+            } : {
+                'Accept': 'application/json',
+            }
+        })
+            .then(response => {
+            if (response.status === 404) {
+                throw new Error('Resource not found (404)');
+            }
+            else if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+            .then(data => {
+            if (this.cache && data.mappingTarget) {
+                const { searchQuery, redirect } = data.mappingTarget;
+                this.cache.set(userQuery, { redirect: redirect || null, searchQuery }); // ICache für SmartQueryClient
+            }
+            return data.suggestions.map((s) => ({
+                suggestion: s.suggestion,
+                searchQuery: s.payload["mappingTarget.searchQuery"],
+                redirect: s.payload["mappingTarget.redirect"] || null,
+            }));
+        })
+            .catch(e => {
+            console.error(e);
+        });
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/cookies.ts":
 /*!************************!*\
   !*** ./src/cookies.ts ***!
@@ -657,7 +685,7 @@ const generateId = () => {
 
 /***/ }),
 
-/***/ "?fe02":
+/***/ "?ab08":
 /*!************************!*\
   !*** crypto (ignored) ***!
   \************************/
@@ -732,26 +760,26 @@ var __webpack_exports__ = {};
   \**********************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   AbTestSegment: () => (/* reexport safe */ _AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__.AbTestSegment),
-/* harmony export */   AbTestSegmentManager: () => (/* reexport safe */ _AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__.AbTestSegmentManager),
-/* harmony export */   BrowserClientFactory: () => (/* reexport safe */ _ClientFactory__WEBPACK_IMPORTED_MODULE_5__.BrowserClientFactory),
+/* harmony export */   AbTestSegment: () => (/* reexport safe */ _abtest_AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__.AbTestSegment),
+/* harmony export */   AbTestSegmentManager: () => (/* reexport safe */ _abtest_AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__.AbTestSegmentManager),
+/* harmony export */   BrowserClientFactory: () => (/* reexport safe */ _client_ClientFactory__WEBPACK_IMPORTED_MODULE_5__.BrowserClientFactory),
 /* harmony export */   BrowserCookieAccess: () => (/* reexport safe */ _cookies__WEBPACK_IMPORTED_MODULE_0__.BrowserCookieAccess),
 /* harmony export */   ExpressCookieAccess: () => (/* reexport safe */ _cookies__WEBPACK_IMPORTED_MODULE_0__.ExpressCookieAccess),
-/* harmony export */   ExpressJsClientFactory: () => (/* reexport safe */ _ClientFactory__WEBPACK_IMPORTED_MODULE_5__.ExpressJsClientFactory),
+/* harmony export */   ExpressJsClientFactory: () => (/* reexport safe */ _client_ClientFactory__WEBPACK_IMPORTED_MODULE_5__.ExpressJsClientFactory),
 /* harmony export */   SEARCH_COLLECTOR_SESSION_COOKIE_NAME: () => (/* reexport safe */ _cookies__WEBPACK_IMPORTED_MODULE_0__.SEARCH_COLLECTOR_SESSION_COOKIE_NAME),
 /* harmony export */   SimpleMemoryCache: () => (/* reexport safe */ _cache_SimpleMemoryCache__WEBPACK_IMPORTED_MODULE_4__.SimpleMemoryCache),
-/* harmony export */   SmartQueryClient: () => (/* reexport safe */ _SmartQueryClient__WEBPACK_IMPORTED_MODULE_2__.SmartQueryClient),
-/* harmony export */   SmartSuggestClient: () => (/* reexport safe */ _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_3__.SmartSuggestClient),
-/* harmony export */   generateRandomSegment: () => (/* reexport safe */ _AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__.generateRandomSegment),
+/* harmony export */   SmartQueryClient: () => (/* reexport safe */ _client_SmartQueryClient__WEBPACK_IMPORTED_MODULE_2__.SmartQueryClient),
+/* harmony export */   SmartSuggestClient: () => (/* reexport safe */ _client_SmartSuggestClient__WEBPACK_IMPORTED_MODULE_3__.SmartSuggestClient),
+/* harmony export */   generateRandomSegment: () => (/* reexport safe */ _abtest_AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__.generateRandomSegment),
 /* harmony export */   getBrowserCookie: () => (/* reexport safe */ _cookies__WEBPACK_IMPORTED_MODULE_0__.getBrowserCookie),
 /* harmony export */   setBrowserCookie: () => (/* reexport safe */ _cookies__WEBPACK_IMPORTED_MODULE_0__.setBrowserCookie)
 /* harmony export */ });
 /* harmony import */ var _cookies__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cookies */ "./src/cookies.ts");
-/* harmony import */ var _AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AbTestSegmentManager */ "./src/AbTestSegmentManager.ts");
-/* harmony import */ var _SmartQueryClient__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SmartQueryClient */ "./src/SmartQueryClient.ts");
-/* harmony import */ var _SmartSuggestClient__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SmartSuggestClient */ "./src/SmartSuggestClient.ts");
+/* harmony import */ var _abtest_AbTestSegmentManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./abtest/AbTestSegmentManager */ "./src/abtest/AbTestSegmentManager.ts");
+/* harmony import */ var _client_SmartQueryClient__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./client/SmartQueryClient */ "./src/client/SmartQueryClient.ts");
+/* harmony import */ var _client_SmartSuggestClient__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./client/SmartSuggestClient */ "./src/client/SmartSuggestClient.ts");
 /* harmony import */ var _cache_SimpleMemoryCache__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./cache/SimpleMemoryCache */ "./src/cache/SimpleMemoryCache.ts");
-/* harmony import */ var _ClientFactory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ClientFactory */ "./src/ClientFactory.ts");
+/* harmony import */ var _client_ClientFactory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./client/ClientFactory */ "./src/client/ClientFactory.ts");
 
 
 

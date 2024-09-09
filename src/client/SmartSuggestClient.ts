@@ -75,9 +75,20 @@ export class SmartSuggestClient {
         return fetch(`https://saas.searchhub.io/smartsuggest/v4/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
             method: "GET",
             headers: base64Credentials ? {
-                'Authorization': `Basic ${base64Credentials}`
-            } : undefined
-        }).then(res => res.json())
+                'Authorization': `Basic ${base64Credentials}`,
+                'Accept': 'application/json',
+            } : {
+                'Accept': 'application/json',
+            }
+        })
+            .then(response => {
+                if (response.status === 404) {
+                    throw new Error('Resource not found (404). Please check your tenant configuration');
+                } else if (!response.ok) {
+                    throw new Error(`Unexpected error: status ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (this.cache && data.mappingTarget) {
                     const {searchQuery, redirect} = data.mappingTarget;

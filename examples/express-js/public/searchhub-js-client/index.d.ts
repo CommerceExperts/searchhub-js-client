@@ -230,7 +230,7 @@ declare class SmartSuggestClient {
 }
 
 /**
- * InMemoryCache provides an in-memory key-value store with a TTL (Time-To-Live)
+ * SimpleMemoryCache provides an in-memory key-value store with a TTL (Time-To-Live)
  * for each entry and an optional periodic cleanup process to remove expired items.
  *
  * @class

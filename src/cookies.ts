@@ -3,8 +3,9 @@ import {CookieOptions} from "express-serve-static-core";
 
 
 export const SEARCH_COLLECTOR_SESSION_COOKIE_NAME = "SearchCollectorSession";
+const MINUTES_ONE_YEAR = 525960;
 
-export const setBrowserCookie = (name: string, value: string, ttlMinutes ?: number): string => {
+export const setBrowserCookie = (name: string, value: string, ttlMinutes: number = MINUTES_ONE_YEAR): string => {
     let expires = "";
 
     if (ttlMinutes) {

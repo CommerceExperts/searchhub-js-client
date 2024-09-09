@@ -1,6 +1,6 @@
 {
   "name": "searchhub-js-client",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "searchHub javascript client",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

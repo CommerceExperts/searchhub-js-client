@@ -4,6 +4,16 @@
 
 <p align="center">A fast and simple JavaScript client library for searchHubs smartQuery and smartSuggest modules</p>
 
+<p align="center">
+    <a href="#" target="_blank"><img src="https://img.shields.io/github/actions/workflow/status/CommerceExperts/searchhub-js-client/master.yml" alt="build workflow" /></a>
+    <a href="https://github.com/CommerceExperts/searchhub-js-client/blob/feature/ts-webpack/LICENSE" target="_blank"><img src="https://img.shields.io/npm/l/searchhub-js-client" alt="license" /></a>
+    <a href="https://www.npmjs.com/package/searchhub-js-client" target="_blank"><img src="https://img.shields.io/npm/dw/searchhub-js-client" alt="downloads" /></a>
+    <a href="https://www.npmjs.com/package/searchhub-js-client" target="_blank"><img src="https://img.shields.io/librariesio/release/npm/searchhub-js-client" alt="dependencies" /></a>
+    <a href="https://www.npmjs.com/package/searchhub-js-client" target="_blank"><img src="https://img.shields.io/npm/v/searchhub-js-client" alt="version" /></a>
+    <a href="https://twitter.com/cxpsearchhub" target="_blank"><img src="https://img.shields.io/github/stars/CommerceExperts/searchhub-js-client?style=social" alt="stars" /></a>
+    <a href="https://twitter.com/cxpsearchhub" target="_blank"><img src="https://img.shields.io/twitter/follow/cxpsearchhub?style=social" alt="twitter" /></a>
+</p>
+
 # Installation
 
 `npm i -S searchhub-js-client`

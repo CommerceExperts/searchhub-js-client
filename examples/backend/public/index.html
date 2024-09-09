@@ -152,7 +152,6 @@
             }
         }
     </style>
-    <script src="/searchhub-js-client/index.js"></script>
 </head>
 <body>
 
@@ -162,7 +161,7 @@
         <div style="background: var(--primary-color);height: 180px">
             <img height="180px" src="https://www.searchhub.io/wp-content/uploads/2022/08/SearchHubIcon_whitelossles-700x1024.webp" alt="SearchHub Logo">
         </div>
-        <h1>smartSuggest and smartQuery Demo</h1>
+        <h1>Backend Demo</h1>
     </header>
 
     <!-- Search Input -->
@@ -189,17 +188,15 @@
 </footer>
 
 <script>
-    const {BrowserClientFactory} = searchHubClient;
-
-    const {smartSuggestClient, smartQueryClient, abTestManager} = BrowserClientFactory({tenant: "your.tenant", abTestActive: false});
-
     const suggestRenderTarget = document.querySelector("#suggestRenderTarget");
     const queryRenderTarget = document.querySelector("#queryRenderTarget");
 
     document.querySelector("#searchBox").addEventListener("input", e => {
         const userQuery = e.target.value;
 
-        smartSuggestClient.getSuggestions(userQuery).then(suggestions => {
+        fetch(`/smartsuggest?userQuery=${userQuery}`)
+            .then(res => res.json())
+            .then(suggestions => {
             if (suggestions.length === 0) {
                 suggestRenderTarget.innerHTML = "No suggestions found.";
                 return;
@@ -215,7 +212,9 @@
 
     document.querySelector("#searchBox").addEventListener('keyup', function (e) {
         if (e.key === 'Enter') {
-            smartQueryClient.getMapping(e.target.value)
+            const userQuery = e.target.value;
+            fetch(`/smartquery?userQuery=${userQuery}`)
+                .then(res => res.json())
                 .then(mapping => {
                     queryRenderTarget.innerHTML = `
                         <div class="query-result">

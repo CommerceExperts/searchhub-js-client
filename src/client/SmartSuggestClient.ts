@@ -84,6 +84,10 @@ export class SmartSuggestClient {
             .then(response => {
                 if (response.status === 404) {
                     throw new Error('Resource not found (404). Please check your tenant configuration');
+                } else if (response.status === 400 && !userQuery) {
+                    return {
+                        suggestions: []
+                    }
                 } else if (!response.ok) {
                     throw new Error(`Unexpected error: status ${response.status}`);
                 }

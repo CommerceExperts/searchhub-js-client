@@ -9,11 +9,17 @@ const app = express();
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const tenant = "{YOUR}.{TENANT}";
+const abTestActive = false;
+
 app.get('/smartquery', (req, res) => {
+    /**
+     * For the AB test to work we need to create a client per request.
+     */
     const {smartQueryClient} = ExpressJsClientFactory({
-        tenant: "your.tenant",
-        cookieAccess: new ExpressCookieAccess(req, res),
-        abTestActive: false
+        tenant,
+        abTestActive,
+        cookieAccess: new ExpressCookieAccess(req, res)
     });
 
     smartQueryClient.getMapping(req.query.userQuery)
@@ -23,19 +29,22 @@ app.get('/smartquery', (req, res) => {
 });
 
 app.get('/smartsuggest', (req, res) => {
+    /**
+     * For the AB test to work we need to create a client per request.
+     */
     const {smartSuggestClient, abTestManager} = ExpressJsClientFactory({
-        tenant: "your.tenant",
-        cookieAccess: new ExpressCookieAccess(req, res),
-        abTestActive: true
+        tenant,
+        abTestActive,
+        cookieAccess: new ExpressCookieAccess(req, res)
     });
 
-    if (abTestManager.isSearchhubActive()) {
+    if (abTestActive === false || abTestManager.isSearchhubActive()) {
         smartSuggestClient.getSuggestions(req.query.userQuery)
             .then((suggestions) => {
                 res.send(suggestions);
             });
     } else {
-        res.send("No searchhub active");
+        res.send("No searchhub active, TODO implement your own endpoint");
     }
 });
 

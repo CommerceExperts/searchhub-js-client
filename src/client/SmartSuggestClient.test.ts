@@ -38,6 +38,8 @@ describe('SmartSuggestClient', () => {
     let suggestClient: SmartSuggestClient;
 
     beforeEach(() => {
+        jest.clearAllMocks();
+
         cache = {
             set: jest.fn(),
             get: jest.fn(),

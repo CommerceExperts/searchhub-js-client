@@ -6,7 +6,7 @@ const twenty = Math.pow(2, 20);
 /**
  * Create a random number between 0 and 1 using crypto api or Math.random as a fallback
  */
-const random = () => {
+export const random = () => {
     try {
         let cryptoModule;
 

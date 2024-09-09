@@ -12,6 +12,7 @@ describe('SimpleMemoryCache', () => {
 
     afterEach(() => {
         cache.dispose(); // Ensure cache is disposed after each test
+        jest.restoreAllMocks();
     });
 
     test('should store and retrieve values correctly', () => {

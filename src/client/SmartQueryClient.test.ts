@@ -18,6 +18,8 @@ describe('SmartQueryClient', () => {
     let queryClient: SmartQueryClient;
 
     beforeEach(() => {
+        jest.clearAllMocks();
+
         cache = {
             set: jest.fn(),
             get: jest.fn(),

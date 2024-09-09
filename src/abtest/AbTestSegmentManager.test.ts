@@ -6,7 +6,7 @@ describe('AbTestSegmentManager Tests', () => {
     let mockCookieAccess: CookieAccess;
 
     beforeEach(() => {
-        jest.restoreAllMocks();
+        jest.resetAllMocks();
 
         mockCookieAccess = {
             getCookie: jest.fn().mockReturnValue(''),

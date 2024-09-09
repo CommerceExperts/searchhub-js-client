@@ -7,7 +7,9 @@ const mockFetch = jest.fn(() =>
         json: () => Promise.resolve({
             searchQuery: 'mapped query',
             redirect: null
-        })
+        }),
+        ok: true,
+        status: 200,
     })
 );
 

@@ -27,7 +27,7 @@ Checkout the **[examples](https://github.com/CommerceExperts/searchhub-js-client
 recommended browser example
 
 ```typescript
-import {ClientFactory} from "searchhub-js-client";
+import {BrowserClientFactory} from "searchhub-js-client";
 
 const {smartSuggestClient, smartQueryClient, abTestManager} = BrowserClientFactory({
     tenant: "{YOUR}.{TENANT}",

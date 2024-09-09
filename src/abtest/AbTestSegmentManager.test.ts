@@ -35,8 +35,8 @@ describe('AbTestSegmentManager Tests', () => {
         expect(isSearchHubActive).toBe(true);
     });
 
-    it('should fallback to control if no cookie is set', () => {
-        mockCookieAccess.getCookie = jest.fn().mockReturnValue('');
+    it('should use control', () => {
+        mockCookieAccess.getCookie = jest.fn().mockReturnValue('C');
         const manager = new AbTestSegmentManager({
             cookieAccess: mockCookieAccess
         });

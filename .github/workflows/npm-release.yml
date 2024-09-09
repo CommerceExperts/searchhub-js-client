@@ -30,6 +30,6 @@ jobs:
           npm run build:prod --silent
       - name: npm publish
         run: |
-          npm publish --ignore-scripts
+          npm publish --ignore-scripts --loglevel verbose
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

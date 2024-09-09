@@ -12,6 +12,6 @@
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "express": "^4.19.2",
-    "searchhub-js-client": "^0.8.0"
+    "searchhub-js-client": "^0.9.1"
   }
 }

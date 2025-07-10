@@ -15,6 +15,7 @@ export interface SmartQueryClientConfig {
     abTestManager?: AbTestSegmentManager;
     tenant: string;
     apiKey?: string;
+    endpoint?: string;
     isAbTestActive: boolean;
 }
 
@@ -43,6 +44,7 @@ export class SmartQueryClient {
     private readonly customer: string;
     private readonly channel: string;
     private readonly apiKey: string | undefined;
+    private readonly endpoint: string;
     private readonly isAbTestActive: boolean;
     private readonly cache?: ICache<MappingTarget>;
 
@@ -68,6 +70,7 @@ export class SmartQueryClient {
         this.channel = split[1];
         this.apiKey = config.apiKey;
         this.cache = cache;  // Optional cache initialization
+        this.endpoint = config.endpoint || "https://saas.searchhub.io";
     }
 
     /**
@@ -98,7 +101,7 @@ export class SmartQueryClient {
             base64Credentials = btoa(this.customer + ":" + this.apiKey);
         }
 
-        return fetch(`https://saas.searchhub.io/smartquery/v2/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
+        return fetch(`${this.endpoint}/smartquery/v2/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
             method: "GET",
             headers: base64Credentials ? {
                 'Authorization': `Basic ${base64Credentials}`,

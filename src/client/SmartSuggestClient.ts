@@ -12,6 +12,7 @@ import {MappingTarget} from "./SmartQueryClient";
 export interface SmartSuggestClientConfig {
     tenant: string;
     apiKey?: string;
+    endpoint?: string;
 }
 
 /**
@@ -40,6 +41,7 @@ export class SmartSuggestClient {
     private readonly customer: string;
     private readonly channel: string;
     private readonly apiKey: string | undefined;
+    private readonly endpoint: string;
     private readonly cache?: ICache<MappingTarget>;
 
     /**
@@ -57,6 +59,7 @@ export class SmartSuggestClient {
         this.channel = split[1];
         this.apiKey = config.apiKey;
         this.cache = cache;  // Optional cache initialization
+        this.endpoint = config.endpoint || "https://saas.searchhub.io";
     }
 
     /**
@@ -72,7 +75,7 @@ export class SmartSuggestClient {
             base64Credentials = btoa(this.customer + ":" + this.apiKey);
         }
 
-        return fetch(`https://saas.searchhub.io/smartsuggest/v4/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
+        return fetch(`${this.endpoint}/smartsuggest/v4/${this.customer}/${this.channel}?userQuery=${userQuery}`, {
             method: "GET",
             headers: base64Credentials ? {
                 'Authorization': `Basic ${base64Credentials}`,
